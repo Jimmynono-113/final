@@ -112,7 +112,7 @@
     <main class="app">
       <header class="top">
         <div class="title">迷霧遺跡：分頁選擇冒險</div>
-        <div class="progress" id="progress">第 1 / 1 頁</div>
+        <div class="progress" id="progress">第 1 步</div>
       </header>
 
       <section class="scene">
@@ -244,7 +244,6 @@
       const progressEl = document.getElementById("progress");
       const route = [];
       let currentId = "intro";
-      const TOTAL_SCENES = Object.keys(scenes).length;
 
       function renderScene(sceneId) {
         const scene = scenes[sceneId];
@@ -256,7 +255,7 @@
         choicesEl.innerHTML = "";
 
         route.push(sceneId);
-        progressEl.textContent = `第 ${route.length} 步 / 共 ${TOTAL_SCENES} 個場景`;
+        progressEl.textContent = `第 ${route.length} 步`;
 
         scene.choices.forEach((choice) => {
           const btn = document.createElement("button");
