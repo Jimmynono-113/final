@@ -116,7 +116,7 @@
   <div class="app">
     <section class="hero">
       <h1>病房最後一道選擇</h1>
-      <p>你是泌尿腫瘤病房的實習醫師／見習住院醫師。你的任務是在有限時間、資訊不完整與家屬壓力下，為病人做出可被理解且可被回顧的照護決策。</p>
+      <p>你是泌尿腫瘤病房的實習醫師 ／ 見習住院醫師。你的任務是在有限時間、資訊不完整與家屬壓力下，為病人做出可被理解且可被回顧的照護決策。</p>
       <p>系統會追蹤四個倫理分數加上一個信任指標，並逐步揭露病程、檢查結果與家屬立場。</p>
       <div id="meters" class="meters"></div>
     </section>
@@ -379,6 +379,7 @@
     // 300 以上代表已掌握關鍵步驟但仍存在可改進斷點。
     const SCORE_THRESHOLD_HIGH = 380;
     const SCORE_THRESHOLD_MEDIUM = 300;
+    const AUTO_END_TOKEN = 'AUTO_END';
     const svgDataUrl = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
     const DEFAULT_HISTORY_TEXT = '已更新情境。';
     const illustrations = {
@@ -580,7 +581,7 @@
       state.transitionArtKey = node.artKey || 'admission';
 
       let next = choice.to;
-      if (choice.dynamicEnd || next === 'AUTO_END') next = getAutoEnding();
+      if (choice.dynamicEnd || next === AUTO_END_TOKEN) next = getAutoEnding();
       state.pendingNext = next;
       state.current = 'transition';
       renderNode();
