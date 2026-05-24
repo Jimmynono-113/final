@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 800" role="img" aria-label="尊嚴善終場景插圖">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1b4b3b"/>
+      <stop offset="55%" stop-color="#4f8f73"/>
+      <stop offset="100%" stop-color="#a6c5aa"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="55%" cy="34%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="grain" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="7"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 0.06"/></feComponentTransfer>
+    </filter>
+    <filter id="blurSoft"><feGaussianBlur stdDeviation="10"/></filter>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.06"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1400" height="800" fill="url(#bg)"/>
+  <rect width="1400" height="800" fill="url(#spot)"/>
+  <path d="M-100 170 C 190 100, 420 260, 760 170 C 1000 100, 1180 250, 1520 180 L 1520 900 L -120 900 Z" fill="#e8efe0" fill-opacity="0.05"/><path d="M-100 290 C 190 220, 420 380, 760 290 C 1000 220, 1180 370, 1520 300 L 1520 900 L -120 900 Z" fill="#e8efe0" fill-opacity="0.08"/><path d="M-100 410 C 190 340, 420 500, 760 410 C 1000 340, 1180 490, 1520 420 L 1520 900 L -120 900 Z" fill="#e8efe0" fill-opacity="0.11"/><path d="M-100 530 C 190 460, 420 620, 760 530 C 1000 460, 1180 610, 1520 540 L 1520 900 L -120 900 Z" fill="#e8efe0" fill-opacity="0.14"/>
+  <g filter="url(#blurSoft)"><ellipse cx="1240" cy="-48" rx="197" ry="48" fill="#ffffff" fill-opacity="0.204"/><ellipse cx="383" cy="579" rx="187" ry="146" fill="#a6c5aa" fill-opacity="0.198"/><ellipse cx="1300" cy="317" rx="84" ry="83" fill="#a6c5aa" fill-opacity="0.080"/><ellipse cx="634" cy="395" rx="205" ry="96" fill="#a6c5aa" fill-opacity="0.115"/><ellipse cx="689" cy="416" rx="67" ry="88" fill="#a6c5aa" fill-opacity="0.136"/><ellipse cx="428" cy="857" rx="114" ry="78" fill="#e8efe0" fill-opacity="0.228"/><ellipse cx="1318" cy="57" rx="88" ry="148" fill="#e8efe0" fill-opacity="0.115"/><ellipse cx="367" cy="161" rx="143" ry="42" fill="#e8efe0" fill-opacity="0.145"/><ellipse cx="774" cy="308" rx="114" ry="100" fill="#e8efe0" fill-opacity="0.166"/><ellipse cx="1289" cy="833" rx="174" ry="88" fill="#ffffff" fill-opacity="0.188"/><ellipse cx="1083" cy="801" rx="162" ry="116" fill="#ffffff" fill-opacity="0.203"/><ellipse cx="-64" cy="633" rx="88" ry="105" fill="#e8efe0" fill-opacity="0.096"/><ellipse cx="19" cy="401" rx="89" ry="88" fill="#ffffff" fill-opacity="0.114"/><ellipse cx="422" cy="141" rx="96" ry="41" fill="#a6c5aa" fill-opacity="0.187"/><ellipse cx="1127" cy="54" rx="124" ry="135" fill="#a6c5aa" fill-opacity="0.201"/><ellipse cx="491" cy="-41" rx="193" ry="121" fill="#ffffff" fill-opacity="0.134"/><ellipse cx="1131" cy="262" rx="218" ry="141" fill="#e8efe0" fill-opacity="0.148"/><ellipse cx="1293" cy="-8" rx="198" ry="139" fill="#e8efe0" fill-opacity="0.114"/><ellipse cx="439" cy="310" rx="192" ry="60" fill="#e8efe0" fill-opacity="0.185"/><ellipse cx="651" cy="618" rx="165" ry="93" fill="#a6c5aa" fill-opacity="0.216"/><ellipse cx="196" cy="42" rx="97" ry="52" fill="#ffffff" fill-opacity="0.130"/><ellipse cx="950" cy="705" rx="93" ry="145" fill="#e8efe0" fill-opacity="0.203"/><ellipse cx="1188" cy="159" rx="66" ry="144" fill="#ffffff" fill-opacity="0.184"/><ellipse cx="5" cy="309" rx="146" ry="126" fill="#ffffff" fill-opacity="0.216"/></g>
+
+  <g opacity="0.78">
+    <path d="M140 710 C 130 590, 180 500, 290 470 C 370 450, 430 500, 445 585 C 455 650, 450 700, 450 710 Z" fill="#13263c"/>
+    <ellipse cx="320" cy="430" rx="64" ry="74" fill="#f0cfbd"/>
+    <path d="M260 432 C 264 365, 375 355, 385 430 C 348 445, 294 445, 260 432 Z" fill="#e8d6c8" fill-opacity="0.32"/>
+    <path d="M530 705 C 520 560, 620 445, 760 450 C 930 458, 1006 585, 990 705 Z" fill="#182f4a"/>
+    <ellipse cx="760" cy="400" rx="76" ry="90" fill="#f0cfbd"/>
+  </g>
+
+  <g>
+    <rect x="870" y="120" width="420" height="560" rx="28" fill="url(#card)" stroke="#ffffff" stroke-opacity="0.24"/>
+    <rect x="920" y="180" width="320" height="54" rx="14" fill="#ffffff" fill-opacity="0.28"/>
+    <rect x="920" y="262" width="286" height="40" rx="12" fill="#ffffff" fill-opacity="0.22"/>
+    <rect x="920" y="320" width="250" height="40" rx="12" fill="#ffffff" fill-opacity="0.19"/>
+    <rect x="920" y="378" width="305" height="40" rx="12" fill="#ffffff" fill-opacity="0.16"/>
+  </g>
+
+  <g filter="url(#grain)"><rect width="1400" height="800" fill="#000"/></g>
+  <text x="88" y="112" fill="#ffffff" fill-opacity="0.90" font-family="'Noto Sans TC',sans-serif" font-size="44" font-weight="700">尊嚴善終</text>
+</svg>

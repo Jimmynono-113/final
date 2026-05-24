@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 800" role="img" aria-label="限時治療場景插圖">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#13395c"/>
+      <stop offset="55%" stop-color="#3e6f9f"/>
+      <stop offset="100%" stop-color="#8eb6d8"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="55%" cy="34%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="grain" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="7"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 0.06"/></feComponentTransfer>
+    </filter>
+    <filter id="blurSoft"><feGaussianBlur stdDeviation="10"/></filter>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.06"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1400" height="800" fill="url(#bg)"/>
+  <rect width="1400" height="800" fill="url(#spot)"/>
+  <path d="M-100 170 C 190 100, 420 260, 760 170 C 1000 100, 1180 250, 1520 180 L 1520 900 L -120 900 Z" fill="#e3eef7" fill-opacity="0.05"/><path d="M-100 290 C 190 220, 420 380, 760 290 C 1000 220, 1180 370, 1520 300 L 1520 900 L -120 900 Z" fill="#e3eef7" fill-opacity="0.08"/><path d="M-100 410 C 190 340, 420 500, 760 410 C 1000 340, 1180 490, 1520 420 L 1520 900 L -120 900 Z" fill="#e3eef7" fill-opacity="0.11"/><path d="M-100 530 C 190 460, 420 620, 760 530 C 1000 460, 1180 610, 1520 540 L 1520 900 L -120 900 Z" fill="#e3eef7" fill-opacity="0.14"/>
+  <g filter="url(#blurSoft)"><ellipse cx="166" cy="385" rx="139" ry="142" fill="#ffffff" fill-opacity="0.185"/><ellipse cx="75" cy="643" rx="166" ry="114" fill="#e3eef7" fill-opacity="0.131"/><ellipse cx="748" cy="232" rx="123" ry="143" fill="#8eb6d8" fill-opacity="0.149"/><ellipse cx="205" cy="156" rx="140" ry="40" fill="#8eb6d8" fill-opacity="0.133"/><ellipse cx="310" cy="617" rx="120" ry="55" fill="#e3eef7" fill-opacity="0.102"/><ellipse cx="925" cy="864" rx="164" ry="107" fill="#ffffff" fill-opacity="0.217"/><ellipse cx="253" cy="719" rx="209" ry="46" fill="#8eb6d8" fill-opacity="0.182"/><ellipse cx="278" cy="-52" rx="134" ry="105" fill="#8eb6d8" fill-opacity="0.171"/><ellipse cx="735" cy="851" rx="172" ry="103" fill="#8eb6d8" fill-opacity="0.172"/><ellipse cx="1181" cy="475" rx="166" ry="91" fill="#8eb6d8" fill-opacity="0.162"/><ellipse cx="55" cy="169" rx="185" ry="144" fill="#ffffff" fill-opacity="0.110"/><ellipse cx="936" cy="29" rx="156" ry="76" fill="#e3eef7" fill-opacity="0.094"/><ellipse cx="1090" cy="790" rx="171" ry="41" fill="#ffffff" fill-opacity="0.185"/><ellipse cx="950" cy="591" rx="197" ry="62" fill="#ffffff" fill-opacity="0.173"/><ellipse cx="488" cy="22" rx="87" ry="93" fill="#8eb6d8" fill-opacity="0.184"/><ellipse cx="1045" cy="189" rx="176" ry="128" fill="#8eb6d8" fill-opacity="0.178"/><ellipse cx="1089" cy="28" rx="118" ry="145" fill="#ffffff" fill-opacity="0.082"/><ellipse cx="824" cy="216" rx="154" ry="109" fill="#ffffff" fill-opacity="0.211"/><ellipse cx="426" cy="267" rx="184" ry="45" fill="#8eb6d8" fill-opacity="0.127"/><ellipse cx="121" cy="672" rx="115" ry="135" fill="#e3eef7" fill-opacity="0.214"/><ellipse cx="1400" cy="465" rx="83" ry="99" fill="#8eb6d8" fill-opacity="0.175"/><ellipse cx="1186" cy="540" rx="141" ry="134" fill="#e3eef7" fill-opacity="0.087"/><ellipse cx="343" cy="125" rx="209" ry="122" fill="#8eb6d8" fill-opacity="0.081"/><ellipse cx="1211" cy="367" rx="98" ry="137" fill="#e3eef7" fill-opacity="0.112"/></g>
+
+  <g opacity="0.78">
+    <path d="M140 710 C 130 590, 180 500, 290 470 C 370 450, 430 500, 445 585 C 455 650, 450 700, 450 710 Z" fill="#13263c"/>
+    <ellipse cx="320" cy="430" rx="64" ry="74" fill="#c8dff0"/>
+    <path d="M260 432 C 264 365, 375 355, 385 430 C 348 445, 294 445, 260 432 Z" fill="#e8d6c8" fill-opacity="0.32"/>
+    <path d="M530 705 C 520 560, 620 445, 760 450 C 930 458, 1006 585, 990 705 Z" fill="#182f4a"/>
+    <ellipse cx="760" cy="400" rx="76" ry="90" fill="#c8dff0"/>
+  </g>
+
+  <g>
+    <rect x="870" y="120" width="420" height="560" rx="28" fill="url(#card)" stroke="#ffffff" stroke-opacity="0.24"/>
+    <rect x="920" y="180" width="320" height="54" rx="14" fill="#ffffff" fill-opacity="0.28"/>
+    <rect x="920" y="262" width="286" height="40" rx="12" fill="#ffffff" fill-opacity="0.22"/>
+    <rect x="920" y="320" width="250" height="40" rx="12" fill="#ffffff" fill-opacity="0.19"/>
+    <rect x="920" y="378" width="305" height="40" rx="12" fill="#ffffff" fill-opacity="0.16"/>
+  </g>
+
+  <g filter="url(#grain)"><rect width="1400" height="800" fill="#000"/></g>
+  <text x="88" y="112" fill="#ffffff" fill-opacity="0.90" font-family="'Noto Sans TC',sans-serif" font-size="44" font-weight="700">限時治療</text>
+</svg>

@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>病房最後一道選擇</title>
+  <style>
+    :root {
+      --card: #ffffff;
+      --ink: #1f2a37;
+      --muted: #5b6472;
+      --line: #d9e0ea;
+      --accent: #294f7c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", system-ui, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #eef3f8 0%, #f8fafc 100%);
+    }
+    .app { max-width: 980px; margin: 0 auto; padding: 24px; }
+    .hero, .panel, .toolbar {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(16, 24, 40, 0.05);
+    }
+    .hero { padding: 20px 22px; margin-bottom: 18px; }
+    .hero h1 { margin: 0 0 8px; font-size: 1.7rem; }
+    .hero p { margin: 6px 0; color: var(--muted); line-height: 1.7; }
+    .meters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+    .meter { border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: #fbfcfe; }
+    .meter label { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 8px; }
+    .bar { height: 10px; background: #e9eef5; border-radius: 999px; overflow: hidden; }
+    .bar > span { display: block; height: 100%; background: var(--accent); transition: width 0.25s ease; }
+    .layout { display: grid; grid-template-columns: 1fr; gap: 18px; }
+    .panel { padding: 18px; }
+    .stage-panel { animation: fadeStep 0.28s ease; }
+    .eyebrow { font-size: 0.92rem; color: var(--muted); margin-bottom: 8px; }
+    h2 { margin: 0 0 8px; font-size: 1.35rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; color: var(--muted); font-size: 0.94rem; }
+    .tag { background: #f2f6fb; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; }
+    .scene, .feedback, .prompt, .result { line-height: 1.8; white-space: pre-line; }
+    .illustration {
+      margin: 12px 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f4f8fc;
+    }
+    .illustration img {
+      display: block;
+      width: 100%;
+      height: 390px;
+      object-fit: cover;
+    }
+    .illustration p {
+      margin: 0;
+      padding: 8px 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      border-top: 1px solid var(--line);
+      background: #ffffff;
+    }
+    .quote {
+      margin: 14px 0;
+      padding: 12px 14px;
+      border-left: 4px solid var(--accent);
+      background: #f6f9fd;
+      border-radius: 10px;
+    }
+    .choices { display: grid; gap: 10px; margin-top: 18px; }
+    button.choice, button.secondary {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--ink);
+      padding: 14px 16px;
+      text-align: left;
+      border-radius: 12px;
+      font-size: 0.98rem;
+      cursor: pointer;
+    }
+    .feedback {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border: 1px solid #ebd8c7;
+      background: #fff9f2;
+      border-radius: 12px;
+    }
+    .prompt {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border: 1px solid #d8e4d8;
+      background: #f6fbf6;
+      border-radius: 12px;
+    }
+    .result {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+    .aside-block + .aside-block { margin-top: 16px; }
+    .aside-block h3 { margin: 0 0 10px; font-size: 1.05rem; }
+    .list { margin: 0; padding-left: 20px; line-height: 1.7; }
+    .list li + li { margin-top: 8px; }
+    .journal {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 10px 12px;
+    }
+    .journal > summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-weight: 600;
+      outline: none;
+    }
+    .journal-grid {
+      margin-top: 10px;
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+    }
+    .toolbar { padding: 12px; margin-top: 18px; display: flex; justify-content: flex-end; }
+    @keyframes fadeStep {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .meters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .illustration img { height: 240px; }
+      .journal-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <h1>病房最後一道選擇</h1>
+      <p>你是泌尿腫瘤病房的實習醫師／見習住院醫師。你的任務是在有限時間、資訊不完整與家屬壓力下，為病人做出可被理解且可被回顧的照護決策。</p>
+      <p>系統會追蹤四個倫理分數加上一個信任指標，並逐步揭露病程、檢查結果與家屬立場。</p>
+      <div id="meters" class="meters"></div>
+    </section>
+
+    <div class="layout">
+      <section class="panel stage-panel" id="stagePanel">
+        <div id="eyebrow" class="eyebrow"></div>
+        <h2 id="title"></h2>
+        <div id="meta" class="meta"></div>
+        <div id="illustration" class="illustration" hidden>
+          <img id="illustrationImg" alt="">
+          <p id="illustrationCaption"></p>
+        </div>
+        <div id="scene" class="scene"></div>
+        <div id="quote" class="quote" hidden></div>
+        <div id="feedback" class="feedback" hidden></div>
+        <div id="prompt" class="prompt"></div>
+        <div id="result" class="result" hidden></div>
+        <div id="choices" class="choices"></div>
+        <details id="journal" class="journal">
+          <summary>查看本局紀錄（可收合）</summary>
+          <div class="journal-grid">
+            <div class="aside-block">
+              <h3>已揭露資訊</h3>
+              <ul id="reveals" class="list"></ul>
+            </div>
+            <div class="aside-block">
+              <h3>決策紀錄</h3>
+              <ol id="history" class="list"></ol>
+            </div>
+          </div>
+        </details>
+      </section>
+    </div>
+
+    <div class="toolbar">
+      <button id="restart" class="secondary">重新開始</button>
+    </div>
+  </div>
+
+  <script>
+    const baseState = () => ({
+      autonomy: 50,
+      nonmaleficence: 50,
+      beneficence: 50,
+      justice: 50,
+      trust: 50,
+      current: 'admission',
+      history: [],
+      reveals: [
+        '72歲林啟明，轉移性泌尿上皮癌，近一週呼吸急促與食慾下降。',
+        '急診初步評估：肺炎合併缺氧、腎功能惡化，可能需侵入性處置。',
+        '家庭成員：配偶陳太太、長子林先生；兩人對是否說出完整病情意見不一。'
+      ],
+      quote: '',
+      lastFeedback: '',
+      lastChoiceText: '',
+      pendingNext: '',
+      transitionArtKey: 'admission',
+      flags: {
+        disclosure: 'none',
+        goal: 'unclear'
+      }
+    });
+
+    let state = baseState();
+
+    const nodes = {
+      admission: {
+        act: '第一幕｜入院與知情同意',
+        time: '住院日 08:30',
+        place: '泌尿腫瘤病房新收案病室',
+        roles: '你、主治醫師、病人、配偶、長子、護理師',
+        artKey: 'admission',
+        scene: '病人仍能清楚對談，但呼吸急促，說話需要停頓換氣。主治醫師評估若感染惡化，可能需要插管、中心靜脈導管與腎臟相關侵入性處置；你在床邊看到配偶緊握病歷夾，長子在門口來回踱步。長子先把你拉到走廊，要求「不要講太白，爸爸會放棄」。護理師補充：病人剛剛已主動問「我是不是又變嚴重了？」並且希望知道每個處置會帶來什麼生活影響。',
+        prompt: '請先決定你要如何展開第一輪說明。焦點不是把資訊一次倒完，而是誰先聽到、如何確認理解、是否留下可用的病人價值線索。',
+        choices: [
+          {
+            text: '先對病人進行完整、可理解的說明，再詢問他是否同意家屬一起參與後續討論。',
+            to: 'familyGoals',
+            effects: { autonomy: 15, nonmaleficence: 8, beneficence: 8, justice: 2, trust: 15 },
+            feedback: '短期後果：病人理解自己有選擇，也知道侵入性處置不只是一張簽名。\n長期後果：後續若病況惡化，團隊較能依據病人明確表達的價值進行照護計畫。',
+            reveal: [
+              '病人表示：「若恢復機會很低，我不想被長時間插管，但我願意先聽完整選項。」',
+              '病人同意配偶一起參與討論，並要求長子也在場。'
+            ],
+            quote: '病人：我想知道真實情況，如果要做重大決定，請直接跟我說。',
+            setFlag: { disclosure: 'full' }
+          },
+          {
+            text: '依長子要求先不談預後，只請病人快速簽好侵入性處置與檢查同意。',
+            to: 'familyGoals',
+            effects: { autonomy: -12, nonmaleficence: -8, beneficence: -4, justice: 0, trust: -12 },
+            feedback: '短期後果：流程看似順利，家屬暫時比較安心。\n長期後果：若夜間惡化，病人先前未被完整告知，團隊將缺少可依循的價值與目標資訊。',
+            reveal: [
+              '病人只知道「可能要做治療」，但不清楚插管與長期維生風險。',
+              '配偶在病房外低聲表示：先生其實最怕的是被機器拖住。'
+            ],
+            quote: '長子：先救起來再說，現在不要讓他想太多。',
+            setFlag: { disclosure: 'conceal' }
+          },
+          {
+            text: '以病況緊急為由，先安排侵入性處置與檢查，把深入討論延到下午。',
+            to: 'familyGoals',
+            effects: { autonomy: -8, nonmaleficence: -6, beneficence: 4, justice: 0, trust: -6 },
+            feedback: '短期後果：你爭取到一些治療時效，但病人的知情與決策準備被往後推。\n長期後果：如果下午前病況快速變差，團隊可能被迫在資訊不完整下進入高壓決策。',
+            reveal: [
+              '抽血顯示感染指標升高，血氧需求增加。',
+              '護理紀錄提到：病人反覆問「如果救不好，可以不要太痛苦嗎？」'
+            ],
+            quote: '護理師：他不是不想治療，他是怕沒有機會說清楚。',
+            setFlag: { disclosure: 'delay' }
+          }
+        ]
+      },
+      familyGoals: {
+        act: '第二幕｜家庭會議與目標照護',
+        time: '住院日 15:00',
+        place: '家庭會議室',
+        roles: '你、主治醫師、病人、配偶、長子、護理師、社工／安寧團隊可會診',
+        artKey: 'familyGoals',
+        scene: '檢查顯示感染惡化，呼吸衰竭風險上升，今晚是否升級治療可能成為轉折點。家庭會議室裡，病人坐在中央，配偶表情緊繃但專注，長子則多次強調「只要還有機會就全部做」。主治醫師要你先整理會議方向：是以舒適照護優先、設定限時治療試驗，還是暫時維持全治療等待局勢明朗；同時也要想清楚，會議結束後病歷該留下哪些可執行的條件。',
+        prompt: '此幕的核心不是「選擇安寧或積極治療」二選一，而是能否把病人的價值、可逆性與可承受代價說清楚，再形成可執行的照護目標。',
+        choices: [
+          {
+            text: '啟動家庭會議與共享決策，病人明確表示以舒適與尊嚴為優先，並會診安寧共照。',
+            to: 'nightShift',
+            effects: { autonomy: 15, nonmaleficence: 12, beneficence: 12, justice: 5, trust: 8 },
+            feedback: '短期後果：衝突不會立刻消失，但團隊有了明確照護方向，症狀控制可同步啟動。\n長期後果：若夜間惡化，較能避免違背病人價值的延命處置。',
+            reveal: [
+              '病人選擇：若需長時間插管與低機率恢復，傾向不進ICU，優先舒適照護。',
+              '安寧共照可在原病房介入症狀控制、情緒支持與後續轉銜。'
+            ],
+            quote: '病人：我不是不要治療，我是不想只剩下痛苦和機器。',
+            setFlag: { goal: 'comfort' }
+          },
+          {
+            text: '啟動家庭會議與共享決策，病人接受 24 小時限時治療試驗：若氧合與循環無改善，再轉舒適照護。',
+            to: 'nightShift',
+            effects: { autonomy: 12, nonmaleficence: 8, beneficence: 14, justice: 5, trust: 10 },
+            feedback: '短期後果：家屬較能接受，病人也覺得自己沒有被放棄。\n長期後果：團隊取得可再評估、可退出的治療框架，較不易陷入無限延長的失焦救治。',
+            reveal: [
+              '病人接受短期積極治療，但要求若無可逆改善，要回到舒適與家庭陪伴。',
+              '主治醫師要求你把試驗終點寫進病歷：24小時內以氧合、意識與感染反應做再評估。'
+            ],
+            quote: '配偶：如果真有機會，就試一下；但不要讓他一直受苦。',
+            setFlag: { goal: 'trial' }
+          },
+          {
+            text: '避免衝突，接受長子要求維持全治療，不主動記錄病人價值，也不會診。',
+            to: 'nightShift',
+            effects: { autonomy: -15, nonmaleficence: -12, beneficence: -8, justice: -2, trust: -10 },
+            feedback: '短期後果：會議表面上結束得很快，但配偶與護理團隊的不安增加。\n長期後果：夜間惡化時，決策會回到「先救再說」的慣性邏輯，後續爭議與遺憾風險升高。',
+            reveal: [
+              '病歷只留下「家屬同意積極治療」的模糊記載，沒有病人本人價值偏好。',
+              '護理師私下提醒：病人聽到門外談話後表情明顯退縮。'
+            ],
+            quote: '長子：現在談這些太早了，先全部做下去。',
+            setFlag: { goal: 'full' }
+          }
+        ]
+      },
+      nightShift: {
+        act: '第三幕｜夜間惡化與資源分配',
+        time: '住院日 23:40',
+        place: '病房與ICU床位協調線上系統',
+        roles: '你、值班住院醫師、主治醫師、護理師、病人、家屬、床位協調者',
+        artKey: 'nightShift',
+        scene: '病人出現急性惡化，血氧快速下降，監測器警示聲持續響起。值班醫師同步收到床位協調通知：今晚 ICU 只剩 1 床，另一位多重外傷患者也在等待。你必須在幾分鐘內提出處置建議，同時回應家屬情緒、團隊壓力與公平程序要求；每一個字都可能成為事後回顧時的關鍵紀錄。',
+        prompt: '此幕同時考驗四個面向：是否尊重病人既有表達、是否避免無效與額外傷害、是否追求病人利益、以及是否以可被檢驗的公平程序分配有限資源。',
+        choices: [
+          {
+            text: '依病人已表達的價值、治療目標與客觀病況，走正式床位協調程序；若不以 ICU 為目標，立即加強原病房舒適照護與家屬支持。',
+            to: 'AUTO_END',
+            effects: { autonomy: 10, nonmaleficence: 10, beneficence: 8, justice: 15, trust: 8 },
+            feedback: '短期後果：家屬未必立刻同意，但團隊決策一致性上升。\n長期後果：程序可受檢驗，較能留下可被回顧與教學的病歷與倫理理由。',
+            dynamicEnd: true
+          },
+          {
+            text: '受家屬壓力與社會關係影響，強行要求 ICU 床位，先插管再說。',
+            to: 'endingOver',
+            effects: { autonomy: -12, nonmaleficence: -15, beneficence: -6, justice: -18, trust: -10 },
+            feedback: '短期後果：家屬感覺你有「拼命救」，但團隊對公平與適切性開始產生質疑。\n長期後果：若處置與病人價值不符，遺憾、道德傷害與申訴風險都會升高。'
+          },
+          {
+            text: '因擔心衝突，先在病房觀察並模糊處理，等再次惡化再決定。',
+            to: 'endingDelay',
+            effects: { autonomy: -10, nonmaleficence: -14, beneficence: -10, justice: -8, trust: -12 },
+            feedback: '短期後果：你暫時躲過正面衝突，但病人與團隊承受更高的不確定性。\n長期後果：拖延會讓決策被急救情境接管，事後也最難教學性地回顧。'
+          }
+        ]
+      },
+      endingDignity: {
+        act: '結局｜尊嚴善終',
+        time: '住院日深夜至隔日',
+        place: '原病房',
+        roles: '病人、家屬、原醫療團隊、安寧共照團隊',
+        artKey: 'endingDignity',
+        scene: '團隊依病人已明確表達的價值，不以 ICU 為治療目標，改由原病房加強症狀控制、情緒支持與家屬陪伴。護理師調整止喘與止痛，社工陪伴家屬整理情緒，病房燈光被調成柔和模式。長子一開始無法接受，但在配偶與團隊共同說明後，逐步理解「不再升級」並不等於「放棄照顧」，而是把照護重心放回病人最在意的生活品質。',
+        prompt: '反思：你是如何把「尊重自主」轉成具體照護安排，而不是只停留在口號？如果要把這個結局做成教學重點，最關鍵的一句病歷紀錄會是什麼？',
+        endingTitle: '結局 A：尊嚴善終與價值一致照護'
+      },
+      endingTrial: {
+        act: '結局｜限時治療',
+        time: '住院日深夜至 24 小時再評估',
+        place: 'ICU 或高依賴照護區',
+        roles: '病人、家屬、原醫療團隊、重症團隊',
+        artKey: 'endingTrial',
+        scene: '團隊依先前談妥的限時治療試驗執行短期積極處置，同步明訂再評估時間點與退出條件。病歷明確寫下 24 小時內需觀察的氧合、循環與意識變化，並於交班時再次口頭確認。治療後若指標改善，可續行治療；若未改善，則依既定共識轉回舒適照護。家屬雖仍焦慮，但較少出現「被突然放棄」的感受。',
+        prompt: '反思：限時治療試驗的核心不是折衷，而是把「目標、時限、退出條件」說清楚。你在遊戲裡有沒有真的留下這三項？',
+        endingTitle: '結局 B：限時治療與可回頭的決策'
+      },
+      endingOver: {
+        act: '結局｜過度治療',
+        time: '住院日深夜後',
+        place: 'ICU',
+        roles: '病人、家屬、團隊、床位協調者',
+        artKey: 'endingOver',
+        scene: '病人被送入 ICU 並接受插管，但團隊很快發現：這個決策其實缺少清楚的病人授權與價值對照。另一位等待床位的病人因此被迫延後，值班團隊也開始出現道德壓力。幾天後，即使生理指標短暫穩定，家屬仍開始質疑病人是否承受了原本不想承受的處置，團隊內部也對決策正當性產生分歧。',
+        prompt: '反思：如果一個決策同時傷害了自主、無害與公平，即使短期看起來像是「有做很多」，為什麼仍可能是失敗的醫療？',
+        endingTitle: '結局 C：家屬主導的過度治療與公平爭議'
+      },
+      endingDelay: {
+        act: '結局｜拖延失控',
+        time: '住院日深夜至急救後',
+        place: '病房／急救現場',
+        roles: '病人、值班團隊、家屬',
+        artKey: 'endingDelay',
+        scene: '由於前面沒有形成可執行的照護目標，病況再惡化時，整個決策被急救流程接管。現場命令密集、家屬情緒崩潰，護理團隊在急救後出現明顯挫折與疲憊。事後病歷也難以重建「當時究竟依據什麼做決定」，這是最容易導向抱怨與創傷回憶的路徑。',
+        prompt: '反思：拖延常被包裝成「再觀察」，但在不穩定病人身上，它往往等於把決策權交給最壞時點。你要如何在臨床上辨認這件事？',
+        endingTitle: '結局 D：拖延、衝突與失控急救'
+      }
+    };
+
+    const meterOrder = [
+      ['autonomy', '自主'],
+      ['nonmaleficence', '無害'],
+      ['beneficence', '利益'],
+      ['justice', '公平'],
+      ['trust', '信任']
+    ];
+
+    const metersEl = document.getElementById('meters');
+    const eyebrowEl = document.getElementById('eyebrow');
+    const titleEl = document.getElementById('title');
+    const metaEl = document.getElementById('meta');
+    const illustrationEl = document.getElementById('illustration');
+    const illustrationImgEl = document.getElementById('illustrationImg');
+    const illustrationCaptionEl = document.getElementById('illustrationCaption');
+    const stagePanelEl = document.getElementById('stagePanel');
+    const journalEl = document.getElementById('journal');
+    const sceneEl = document.getElementById('scene');
+    const quoteEl = document.getElementById('quote');
+    const feedbackEl = document.getElementById('feedback');
+    const promptEl = document.getElementById('prompt');
+    const resultEl = document.getElementById('result');
+    const choicesEl = document.getElementById('choices');
+    const revealsEl = document.getElementById('reveals');
+    const historyEl = document.getElementById('history');
+    const restartBtn = document.getElementById('restart');
+
+    const clamp = (num) => Math.max(0, Math.min(100, num));
+    // 總分上限為 500（5 個指標 × 每項 100 分）；380 以上代表多數節點皆能維持一致倫理取向，
+    // 300 以上代表已掌握關鍵步驟但仍存在可改進斷點。
+    const SCORE_THRESHOLD_HIGH = 380;
+    const SCORE_THRESHOLD_MEDIUM = 300;
+    const AUTO_END_TOKEN = 'AUTO_END';
+    const DEFAULT_HISTORY_TEXT = '已更新情境。';
+    const illustrations = {
+      admission: {
+        caption: '入院病房：病人仍可表達，但已出現急性惡化風險。',
+        src: './assets/illustrations/admission.svg'
+      },
+      familyGoals: {
+        caption: '家庭會議：病人價值、家屬分歧與可執行照護目標。',
+        src: './assets/illustrations/familyGoals.svg'
+      },
+      nightShift: {
+        caption: '夜間惡化：急性壓力下的公平分配與程序正當性。',
+        src: './assets/illustrations/nightShift.svg'
+      },
+      endingDignity: {
+        caption: '結局 A：以病人價值為核心，回到一致的照護安排。',
+        src: './assets/illustrations/endingDignity.svg'
+      },
+      endingTrial: {
+        caption: '結局 B：限時治療，明確時限與退出條件。',
+        src: './assets/illustrations/endingTrial.svg'
+      },
+      endingOver: {
+        caption: '結局 C：程序偏離導致過度治療與公平爭議。',
+        src: './assets/illustrations/endingOver.svg'
+      },
+      endingDelay: {
+        caption: '結局 D：拖延導致急救接管與後續失控。',
+        src: './assets/illustrations/endingDelay.svg'
+      }
+    };
+
+    function buildMeters() {
+      metersEl.innerHTML = '';
+      meterOrder.forEach(([key, label]) => {
+        const card = document.createElement('div');
+        card.className = 'meter';
+        card.innerHTML = `
+          <label><span>${label}</span><strong>${state[key]}</strong></label>
+          <div class="bar"><span style="width:${state[key]}%"></span></div>
+        `;
+        metersEl.appendChild(card);
+      });
+    }
+
+    function renderSidePanel() {
+      revealsEl.innerHTML = '';
+      state.reveals.forEach((item) => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        revealsEl.appendChild(li);
+      });
+
+      historyEl.innerHTML = '';
+      if (!state.history.length) {
+        const li = document.createElement('li');
+        li.textContent = '尚未作出決策。';
+        historyEl.appendChild(li);
+      } else {
+        state.history.forEach((item) => {
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${item.choice}</strong><br>${item.effect}`;
+          historyEl.appendChild(li);
+        });
+      }
+    }
+
+    function getAutoEnding() {
+      if (state.flags.goal === 'comfort') return 'endingDignity';
+      if (state.flags.goal === 'trial') return 'endingTrial';
+      return 'endingOver';
+    }
+
+    function scoreSummary() {
+      const total = state.autonomy + state.nonmaleficence + state.beneficence + state.justice + state.trust;
+      if (total >= SCORE_THRESHOLD_HIGH) return '整體評估：你的決策大致形成了「病人價值—團隊行動—病歷紀錄」的一致鏈。';
+      if (total >= SCORE_THRESHOLD_MEDIUM) return '整體評估：你掌握了部分關鍵倫理步驟，但仍有幾個節點把決策留給了情勢，而不是留給病人。';
+      return '整體評估：過程中出現明顯的價值失焦，病人的聲音、團隊公平程序或傷害控制沒有被穩定地放進決策。';
+    }
+
+    function renderNode() {
+      buildMeters();
+      renderSidePanel();
+      stagePanelEl.classList.remove('stage-panel');
+      void stagePanelEl.offsetWidth;
+      stagePanelEl.classList.add('stage-panel');
+      const isTransitionPage = state.current === 'transition';
+      const node = isTransitionPage ? null : nodes[state.current];
+      const artKey = isTransitionPage ? state.transitionArtKey : node.artKey;
+      const art = illustrations[artKey];
+
+      illustrationEl.hidden = !art;
+      if (art) {
+        illustrationImgEl.src = art.src;
+        illustrationImgEl.alt = art.caption;
+        illustrationCaptionEl.textContent = art.caption;
+      }
+
+      if (isTransitionPage) {
+        eyebrowEl.textContent = '決策回饋頁';
+        titleEl.textContent = '你剛做出的選擇';
+        metaEl.innerHTML = `
+          <span class="tag">下一站：${state.pendingNext && nodes[state.pendingNext] ? nodes[state.pendingNext].act : '結局回顧'}</span>
+          <span class="tag">模式：逐頁推進</span>
+        `;
+        sceneEl.textContent = `你選擇了：${state.lastChoiceText}\n\n在這個節點，你不只是「按下一個選項」，而是明確表態你要優先保護哪些倫理價值。請先閱讀本次決策回饋，再進入下一頁情境。`;
+        promptEl.textContent = '請先確認你是否接受這個決策的短期與長期代價，再按下「前往下一頁」。';
+      } else {
+        eyebrowEl.textContent = node.act;
+        titleEl.textContent = node.endingTitle || node.place;
+        metaEl.innerHTML = `
+        <span class="tag">時間：${node.time}</span>
+        <span class="tag">角色：${node.roles}</span>
+      `;
+        sceneEl.textContent = node.scene;
+        promptEl.textContent = node.prompt;
+      }
+      journalEl.open = Boolean(node?.endingTitle);
+
+      if (state.quote) {
+        quoteEl.hidden = false;
+        quoteEl.textContent = state.quote;
+      } else {
+        quoteEl.hidden = true;
+      }
+
+      if (state.lastFeedback) {
+        feedbackEl.hidden = false;
+        feedbackEl.textContent = state.lastFeedback;
+      } else {
+        feedbackEl.hidden = true;
+      }
+
+      resultEl.hidden = isTransitionPage || !node?.endingTitle;
+      if (!isTransitionPage && node?.endingTitle) {
+        resultEl.innerHTML = `
+          <strong>${node.endingTitle}</strong><br>
+          ${scoreSummary()}<br>
+          目前分數：自主 ${state.autonomy}｜無害 ${state.nonmaleficence}｜利益 ${state.beneficence}｜公平 ${state.justice}｜信任 ${state.trust}
+        `;
+      } else {
+        resultEl.innerHTML = '';
+      }
+
+      choicesEl.innerHTML = '';
+      if (isTransitionPage) {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.textContent = '前往下一頁';
+        btn.addEventListener('click', () => {
+          state.quote = '';
+          state.lastFeedback = '';
+          state.current = state.pendingNext;
+          state.pendingNext = '';
+          renderNode();
+        });
+        choicesEl.appendChild(btn);
+        return;
+      }
+      if (!node.choices || !node.choices.length) return;
+      node.choices.forEach((choice, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.textContent = choice.text;
+        btn.addEventListener('click', () => choose(index));
+        choicesEl.appendChild(btn);
+      });
+    }
+
+    function applyEffects(effects = {}) {
+      Object.keys(effects).forEach((key) => {
+        state[key] = clamp(state[key] + effects[key]);
+      });
+    }
+
+    function choose(index) {
+      const node = nodes[state.current];
+      const choice = node.choices[index];
+
+      applyEffects(choice.effects);
+      if (choice.reveal) state.reveals.push(...choice.reveal);
+      if (choice.setFlag) Object.assign(state.flags, choice.setFlag);
+
+      state.quote = choice.quote || '';
+      state.lastFeedback = choice.feedback || '';
+      state.lastChoiceText = choice.text;
+      state.history.push({ choice: choice.text, effect: choice.feedback || DEFAULT_HISTORY_TEXT });
+      state.transitionArtKey = node.artKey || 'admission';
+
+      let next = choice.to;
+      if (choice.dynamicEnd || next === AUTO_END_TOKEN) next = getAutoEnding();
+      state.pendingNext = next;
+      state.current = 'transition';
+      renderNode();
+    }
+
+    restartBtn.addEventListener('click', () => {
+      state = baseState();
+      renderNode();
+    });
+
+    renderNode();
+  </script>
+</body>
+</html>
