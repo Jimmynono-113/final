@@ -375,6 +375,8 @@
     const restartBtn = document.getElementById('restart');
 
     const clamp = (num) => Math.max(0, Math.min(100, num));
+    // 總分上限為 500（5 個指標 × 每項 100 分）；380 以上代表多數節點皆能維持一致倫理取向，
+    // 300 以上代表已掌握關鍵步驟但仍存在可改進斷點。
     const SCORE_THRESHOLD_HIGH = 380;
     const SCORE_THRESHOLD_MEDIUM = 300;
     const svgDataUrl = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
@@ -464,7 +466,6 @@
     function getAutoEnding() {
       if (state.flags.goal === 'comfort') return 'endingDignity';
       if (state.flags.goal === 'trial') return 'endingTrial';
-      if (state.flags.goal === 'full' || state.flags.goal === 'unclear') return 'endingOver';
       return 'endingOver';
     }
 
