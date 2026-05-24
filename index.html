@@ -116,7 +116,7 @@
   <div class="app">
     <section class="hero">
       <h1>病房最後一道選擇</h1>
-      <p>你是泌尿腫瘤病房的實習醫師 ／ 見習住院醫師。你的任務是在有限時間、資訊不完整與家屬壓力下，為病人做出可被理解且可被回顧的照護決策。</p>
+      <p>你是泌尿腫瘤病房的實習醫師／見習住院醫師。你的任務是在有限時間、資訊不完整與家屬壓力下，為病人做出可被理解且可被回顧的照護決策。</p>
       <p>系統會追蹤四個倫理分數加上一個信任指標，並逐步揭露病程、檢查結果與家屬立場。</p>
       <div id="meters" class="meters"></div>
     </section>
@@ -526,8 +526,8 @@
         feedbackEl.hidden = true;
       }
 
-      resultEl.hidden = isTransitionPage || !node.endingTitle;
-      if (!isTransitionPage && node.endingTitle) {
+      resultEl.hidden = isTransitionPage || !node?.endingTitle;
+      if (!isTransitionPage && node?.endingTitle) {
         resultEl.innerHTML = `
           <strong>${node.endingTitle}</strong><br>
           ${scoreSummary()}<br>
@@ -550,7 +550,7 @@
         choicesEl.appendChild(btn);
         return;
       }
-      if (!node.choices) return;
+      if (!node.choices || !node.choices.length) return;
       node.choices.forEach((choice, index) => {
         const btn = document.createElement('button');
         btn.className = 'choice';
