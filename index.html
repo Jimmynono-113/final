@@ -117,7 +117,7 @@
     <section class="hero">
       <h1>病房最後一道選擇</h1>
       <p>你是泌尿腫瘤病房的實習醫師／見習住院醫師。你的任務是在有限時間、資訊不完整與家屬壓力下，為病人做出可被理解且可被回顧的照護決策。</p>
-      <p>系統會追蹤四個倫理分數與信任指標，並逐步揭露病程、檢查結果與家屬立場。</p>
+      <p>系統會追蹤四個倫理分數加上一個信任指標，並逐步揭露病程、檢查結果與家屬立場。</p>
       <div id="meters" class="meters"></div>
     </section>
 
@@ -375,6 +375,8 @@
     const restartBtn = document.getElementById('restart');
 
     const clamp = (num) => Math.max(0, Math.min(100, num));
+    const SCORE_THRESHOLD_HIGH = 380;
+    const SCORE_THRESHOLD_MEDIUM = 300;
     const svgDataUrl = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
     const DEFAULT_HISTORY_TEXT = '已更新情境。';
     const illustrations = {
@@ -462,13 +464,14 @@
     function getAutoEnding() {
       if (state.flags.goal === 'comfort') return 'endingDignity';
       if (state.flags.goal === 'trial') return 'endingTrial';
+      if (state.flags.goal === 'full' || state.flags.goal === 'unclear') return 'endingOver';
       return 'endingOver';
     }
 
     function scoreSummary() {
       const total = state.autonomy + state.nonmaleficence + state.beneficence + state.justice + state.trust;
-      if (total >= 380) return '整體評估：你的決策大致形成了「病人價值—團隊行動—病歷紀錄」的一致鏈。';
-      if (total >= 300) return '整體評估：你掌握了部分關鍵倫理步驟，但仍有幾個節點把決策留給了情勢，而不是留給病人。';
+      if (total >= SCORE_THRESHOLD_HIGH) return '整體評估：你的決策大致形成了「病人價值—團隊行動—病歷紀錄」的一致鏈。';
+      if (total >= SCORE_THRESHOLD_MEDIUM) return '整體評估：你掌握了部分關鍵倫理步驟，但仍有幾個節點把決策留給了情勢，而不是留給病人。';
       return '整體評估：過程中出現明顯的價值失焦，病人的聲音、團隊公平程序或傷害控制沒有被穩定地放進決策。';
     }
 
