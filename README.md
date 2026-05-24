@@ -5,4 +5,4 @@
 - 每個場景都搭配符合情境的插圖。
 - 敘述內容改為更完整、細節更豐富的版本。
 
-直接用瀏覽器開啟 `/home/runner/work/final/final/index.html` 即可體驗。
+直接用瀏覽器開啟 `./index.html` 即可體驗。

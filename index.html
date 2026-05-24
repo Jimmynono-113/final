@@ -244,6 +244,7 @@
       const progressEl = document.getElementById("progress");
       const route = [];
       let currentId = "intro";
+      const TOTAL_SCENES = Object.keys(scenes).length;
 
       function renderScene(sceneId) {
         const scene = scenes[sceneId];
@@ -255,7 +256,7 @@
         choicesEl.innerHTML = "";
 
         route.push(sceneId);
-        progressEl.textContent = `第 ${route.length} / ${route.length} 頁`;
+        progressEl.textContent = `第 ${route.length} 步 / 共 ${TOTAL_SCENES} 個場景`;
 
         scene.choices.forEach((choice) => {
           const btn = document.createElement("button");
