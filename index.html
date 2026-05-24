@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>層層推進的互動故事</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0f172a;
+        --card: #111827;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --accent: #22d3ee;
+        --accent-2: #a78bfa;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+        background: radial-gradient(circle at 20% 20%, #1e293b, var(--bg) 50%);
+        color: var(--text);
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+      .app {
+        width: min(900px, 100%);
+        background: color-mix(in srgb, var(--card), black 8%);
+        border: 1px solid #334155;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        border-bottom: 1px solid #334155;
+      }
+      .progress {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .title {
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .scene {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 0;
+      }
+      .illustration {
+        min-height: 320px;
+        background: linear-gradient(160deg, #0b1220, #111827);
+        display: grid;
+        place-items: center;
+        border-right: 1px solid #334155;
+        padding: 18px;
+      }
+      .content {
+        padding: 24px;
+      }
+      .content h2 {
+        margin: 0 0 12px;
+        font-size: 1.4rem;
+      }
+      .content p {
+        margin: 0 0 18px;
+        line-height: 1.8;
+        color: #dbeafe;
+      }
+      .choices {
+        display: grid;
+        gap: 10px;
+      }
+      button {
+        border: 1px solid #334155;
+        border-radius: 12px;
+        background: #1e293b;
+        color: var(--text);
+        text-align: left;
+        padding: 12px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      button:hover {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+      button.primary {
+        background: linear-gradient(135deg, #155e75, #4c1d95);
+        border-color: color-mix(in srgb, var(--accent-2), white 15%);
+      }
+      .footer {
+        border-top: 1px solid #334155;
+        padding: 12px 20px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      svg { width: 100%; height: auto; max-height: 280px; }
+      @media (max-width: 760px) {
+        .scene { grid-template-columns: 1fr; }
+        .illustration { border-right: 0; border-bottom: 1px solid #334155; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="top">
+        <div class="title">迷霧遺跡：分頁選擇冒險</div>
+        <div class="progress" id="progress">第 1 / 1 頁</div>
+      </header>
+
+      <section class="scene">
+        <div class="illustration" id="illustration"></div>
+        <article class="content">
+          <h2 id="scene-title"></h2>
+          <p id="scene-desc"></p>
+          <div class="choices" id="choices"></div>
+        </article>
+      </section>
+
+      <footer class="footer">
+        每次只需選擇目前頁面的下一步，故事會一層一層往前推進。
+      </footer>
+    </main>
+
+    <script>
+      const scenes = {
+        intro: {
+          title: "遺跡入口",
+          desc: "你在黃昏時分抵達山谷深處，風穿過破裂石柱發出低鳴。石階上還留著新鮮腳印，表示不久前有人比你更早進入遺跡。你握緊提燈，聞到空氣中潮濕與金屬交錯的味道，心裡明白這次探索不只是尋寶，而是一次關於真相的追蹤。",
+          art: "gate",
+          choices: [
+            { text: "踏入遺跡前廳", next: "hall" }
+          ]
+        },
+        hall: {
+          title: "回音前廳",
+          desc: "前廳的圓頂高聳，地面鑲著龜裂星圖。每走一步，回音都像被牆面吸收再放大。你注意到左側通道有微弱藍光，右側則是向下盤旋的石梯，冷風從深處持續湧上，像在催促你做出下一個決定。",
+          art: "hall",
+          choices: [
+            { text: "走向藍光通道", next: "library" },
+            { text: "沿石梯往下", next: "chamber" }
+          ]
+        },
+        library: {
+          title: "沉睡書庫",
+          desc: "書庫裡的木架早已傾斜，灰塵在光束中緩慢飄動。你翻開一本未完全腐朽的手抄本，裡面記錄著『月井』與『守門誓約』。字跡在關鍵段落突然中斷，只留下指向地下祭室的記號，像是有人刻意把最重要的線索藏到更深處。",
+          art: "library",
+          choices: [
+            { text: "依照記號前往祭室", next: "chamber" }
+          ]
+        },
+        chamber: {
+          title: "月井祭室",
+          desc: "你來到圓形祭室中央，井口映出銀白色光暈。牆面的浮雕描繪著守門者交接的儀式，而那串新腳印正停在井邊。此刻你終於理解：遺跡的真正秘密不是寶藏，而是選擇誰來承擔守護的責任。你深吸一口氣，準備做出最後決定。",
+          art: "moonwell",
+          choices: [
+            { text: "接受守門誓約（結局）", next: "ending_guardian", primary: true },
+            { text: "帶著紀錄離開（結局）", next: "ending_scholar", primary: true }
+          ]
+        },
+        ending_guardian: {
+          title: "結局：新的守門者",
+          desc: "你把手掌貼上井緣，古老紋路在掌心點亮。風聲停止，祭室回歸寧靜。你知道自己將長久留在此地，但也阻止了遺跡力量落入錯誤之手。夜色降臨時，入口石門緩緩關上，你成為下一位守門者。",
+          art: "guardian",
+          choices: [
+            { text: "重新開始", next: "intro" }
+          ]
+        },
+        ending_scholar: {
+          title: "結局：帶走真相的人",
+          desc: "你沒有觸碰井口，只把所有符號與文獻仔細抄錄。離開遺跡時，天邊剛好泛白。你知道自己選擇了另一種守護方式：把秘密公開、讓後世理解風險與代價。數月後，你的研究改寫了整個地區對遺跡文明的認識。",
+          art: "scholar",
+          choices: [
+            { text: "重新開始", next: "intro" }
+          ]
+        }
+      };
+
+      const artMap = {
+        gate: `
+          <svg viewBox="0 0 420 260" role="img" aria-label="遺跡入口插圖">
+            <rect width="420" height="260" fill="#0b1220"/>
+            <rect x="130" y="60" width="160" height="150" fill="#1f2937" stroke="#64748b" stroke-width="4"/>
+            <rect x="160" y="90" width="100" height="120" fill="#0f172a"/>
+            <circle cx="210" cy="150" r="6" fill="#22d3ee"/>
+            <path d="M30 220 L390 220" stroke="#334155" stroke-width="6"/>
+            <path d="M70 220 L210 165 L350 220" fill="none" stroke="#475569" stroke-width="3"/>
+          </svg>`,
+        hall: `
+          <svg viewBox="0 0 420 260" role="img" aria-label="前廳插圖">
+            <rect width="420" height="260" fill="#111827"/>
+            <path d="M40 220 L210 40 L380 220" fill="none" stroke="#334155" stroke-width="8"/>
+            <circle cx="210" cy="130" r="26" fill="#1e293b" stroke="#22d3ee" stroke-width="3"/>
+            <path d="M210 60 V200 M140 130 H280" stroke="#475569" stroke-width="2"/>
+          </svg>`,
+        library: `
+          <svg viewBox="0 0 420 260" role="img" aria-label="書庫插圖">
+            <rect width="420" height="260" fill="#0f172a"/>
+            <rect x="60" y="40" width="70" height="180" fill="#1f2937"/>
+            <rect x="175" y="30" width="70" height="190" fill="#1f2937"/>
+            <rect x="290" y="50" width="70" height="170" fill="#1f2937"/>
+            <rect x="70" y="60" width="50" height="10" fill="#22d3ee"/>
+            <rect x="185" y="70" width="50" height="10" fill="#a78bfa"/>
+            <rect x="300" y="90" width="50" height="10" fill="#38bdf8"/>
+            <circle cx="320" cy="190" r="18" fill="#312e81"/>
+          </svg>`,
+        moonwell: `
+          <svg viewBox="0 0 420 260" role="img" aria-label="月井祭室插圖">
+            <rect width="420" height="260" fill="#020617"/>
+            <circle cx="210" cy="130" r="74" fill="#111827" stroke="#64748b" stroke-width="4"/>
+            <circle cx="210" cy="130" r="40" fill="#334155"/>
+            <circle cx="210" cy="130" r="22" fill="#bfdbfe"/>
+            <path d="M80 220 Q210 180 340 220" stroke="#475569" stroke-width="4" fill="none"/>
+          </svg>`,
+        guardian: `
+          <svg viewBox="0 0 420 260" role="img" aria-label="守門者結局插圖">
+            <rect width="420" height="260" fill="#0c0a24"/>
+            <circle cx="210" cy="120" r="58" fill="#312e81" stroke="#a78bfa" stroke-width="4"/>
+            <rect x="195" y="140" width="30" height="70" fill="#a78bfa"/>
+            <path d="M170 210 H250" stroke="#c4b5fd" stroke-width="5"/>
+          </svg>`,
+        scholar: `
+          <svg viewBox="0 0 420 260" role="img" aria-label="研究者結局插圖">
+            <rect width="420" height="260" fill="#082f49"/>
+            <rect x="90" y="70" width="240" height="140" fill="#0f172a" stroke="#38bdf8" stroke-width="3"/>
+            <line x1="120" y1="100" x2="300" y2="100" stroke="#93c5fd" stroke-width="3"/>
+            <line x1="120" y1="130" x2="280" y2="130" stroke="#93c5fd" stroke-width="3"/>
+            <line x1="120" y1="160" x2="290" y2="160" stroke="#93c5fd" stroke-width="3"/>
+            <circle cx="320" cy="190" r="15" fill="#22d3ee"/>
+          </svg>`
+      };
+
+      const titleEl = document.getElementById("scene-title");
+      const descEl = document.getElementById("scene-desc");
+      const choicesEl = document.getElementById("choices");
+      const illustrationEl = document.getElementById("illustration");
+      const progressEl = document.getElementById("progress");
+      const route = [];
+      let currentId = "intro";
+
+      function renderScene(sceneId) {
+        const scene = scenes[sceneId];
+        if (!scene) return;
+        currentId = sceneId;
+        titleEl.textContent = scene.title;
+        descEl.textContent = scene.desc;
+        illustrationEl.innerHTML = artMap[scene.art] || "";
+        choicesEl.innerHTML = "";
+
+        route.push(sceneId);
+        progressEl.textContent = `第 ${route.length} / ${route.length} 頁`;
+
+        scene.choices.forEach((choice) => {
+          const btn = document.createElement("button");
+          btn.textContent = choice.text;
+          if (choice.primary) btn.classList.add("primary");
+          btn.addEventListener("click", () => {
+            if (choice.next === "intro") route.length = 0;
+            renderScene(choice.next);
+          });
+          choicesEl.appendChild(btn);
+        });
+      }
+
+      renderScene(currentId);
+    </script>
+  </body>
+</html>
