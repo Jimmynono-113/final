@@ -19,7 +19,7 @@
       color: var(--ink);
       background: linear-gradient(180deg, #eef3f8 0%, #f8fafc 100%);
     }
-    .app { max-width: 1180px; margin: 0 auto; padding: 24px; }
+    .app { max-width: 980px; margin: 0 auto; padding: 24px; }
     .hero, .panel, .toolbar {
       background: var(--card);
       border: 1px solid var(--line);
@@ -34,8 +34,9 @@
     .meter label { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 8px; }
     .bar { height: 10px; background: #e9eef5; border-radius: 999px; overflow: hidden; }
     .bar > span { display: block; height: 100%; background: var(--accent); transition: width 0.25s ease; }
-    .layout { display: grid; grid-template-columns: 1.6fr 0.9fr; gap: 18px; }
+    .layout { display: grid; grid-template-columns: 1fr; gap: 18px; }
     .panel { padding: 18px; }
+    .stage-panel { animation: fadeStep 0.28s ease; }
     .eyebrow { font-size: 0.92rem; color: var(--muted); margin-bottom: 8px; }
     h2 { margin: 0 0 8px; font-size: 1.35rem; }
     .meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; color: var(--muted); font-size: 0.94rem; }
@@ -51,7 +52,8 @@
     .illustration img {
       display: block;
       width: 100%;
-      height: auto;
+      height: 390px;
+      object-fit: cover;
     }
     .illustration p {
       margin: 0;
@@ -105,10 +107,35 @@
     .aside-block h3 { margin: 0 0 10px; font-size: 1.05rem; }
     .list { margin: 0; padding-left: 20px; line-height: 1.7; }
     .list li + li { margin-top: 8px; }
+    .journal {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 10px 12px;
+    }
+    .journal > summary {
+      cursor: pointer;
+      color: var(--muted);
+      font-weight: 600;
+      outline: none;
+    }
+    .journal-grid {
+      margin-top: 10px;
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+    }
     .toolbar { padding: 12px; margin-top: 18px; display: flex; justify-content: flex-end; }
+    @keyframes fadeStep {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
       .meters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .illustration img { height: 240px; }
+      .journal-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -122,7 +149,7 @@
     </section>
 
     <div class="layout">
-      <section class="panel">
+      <section class="panel stage-panel" id="stagePanel">
         <div id="eyebrow" class="eyebrow"></div>
         <h2 id="title"></h2>
         <div id="meta" class="meta"></div>
@@ -136,18 +163,20 @@
         <div id="prompt" class="prompt"></div>
         <div id="result" class="result" hidden></div>
         <div id="choices" class="choices"></div>
+        <details id="journal" class="journal">
+          <summary>查看本局紀錄（可收合）</summary>
+          <div class="journal-grid">
+            <div class="aside-block">
+              <h3>已揭露資訊</h3>
+              <ul id="reveals" class="list"></ul>
+            </div>
+            <div class="aside-block">
+              <h3>決策紀錄</h3>
+              <ol id="history" class="list"></ol>
+            </div>
+          </div>
+        </details>
       </section>
-
-      <aside class="panel">
-        <div class="aside-block">
-          <h3>已揭露資訊</h3>
-          <ul id="reveals" class="list"></ul>
-        </div>
-        <div class="aside-block">
-          <h3>決策紀錄</h3>
-          <ol id="history" class="list"></ol>
-        </div>
-      </aside>
     </div>
 
     <div class="toolbar">
@@ -364,6 +393,8 @@
     const illustrationEl = document.getElementById('illustration');
     const illustrationImgEl = document.getElementById('illustrationImg');
     const illustrationCaptionEl = document.getElementById('illustrationCaption');
+    const stagePanelEl = document.getElementById('stagePanel');
+    const journalEl = document.getElementById('journal');
     const sceneEl = document.getElementById('scene');
     const quoteEl = document.getElementById('quote');
     const feedbackEl = document.getElementById('feedback');
@@ -380,52 +411,35 @@
     const SCORE_THRESHOLD_HIGH = 380;
     const SCORE_THRESHOLD_MEDIUM = 300;
     const AUTO_END_TOKEN = 'AUTO_END';
-    const svgDataUrl = (svg) => `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
     const DEFAULT_HISTORY_TEXT = '已更新情境。';
     const illustrations = {
       admission: {
         caption: '入院病房：病人仍可表達，但已出現急性惡化風險。',
-        src: svgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
-          <rect width="800" height="420" fill="#edf3fb"/><rect x="40" y="54" width="720" height="312" rx="20" fill="#ffffff" stroke="#cad7e6"/>
-          <rect x="98" y="130" width="260" height="140" rx="14" fill="#f2f8ff" stroke="#b9cee4"/><circle cx="150" cy="186" r="26" fill="#f9d6c2"/>
-          <rect x="184" y="168" width="124" height="58" rx="10" fill="#dceaf8"/><rect x="390" y="105" width="150" height="190" rx="14" fill="#f7fbff" stroke="#c7d6e8"/>
-          <line x1="465" y1="115" x2="465" y2="285" stroke="#9bb4cd"/><line x1="400" y1="188" x2="530" y2="188" stroke="#9bb4cd"/>
-          <rect x="584" y="154" width="136" height="84" rx="10" fill="#ebf2fa"/><path d="M600 194h96" stroke="#2f5a86" stroke-width="8"/><path d="M648 170v48" stroke="#2f5a86" stroke-width="8"/>
-          <text x="62" y="92" font-size="22" fill="#294f7c" font-family="sans-serif">入院病房：知情與時效壓力並存</text></svg>`)
+        src: './assets/illustrations/admission.svg'
       },
       familyGoals: {
         caption: '家庭會議：病人價值、家屬分歧與可執行照護目標。',
-        src: svgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
-          <rect width="800" height="420" fill="#f0f4fb"/><rect x="52" y="58" width="696" height="304" rx="18" fill="#ffffff" stroke="#cad6e6"/>
-          <rect x="170" y="170" width="460" height="120" rx="18" fill="#e8f1fb" stroke="#b8cde4"/>
-          <circle cx="246" cy="148" r="28" fill="#f3c9b0"/><circle cx="354" cy="132" r="24" fill="#f6d5bf"/><circle cx="454" cy="136" r="26" fill="#f2c5a8"/><circle cx="560" cy="148" r="28" fill="#f3d3bd"/>
-          <rect x="130" y="92" width="180" height="62" rx="10" fill="#f6fbff" stroke="#bfd3e7"/><text x="144" y="130" font-size="18" fill="#294f7c" font-family="sans-serif">舒適照護 / 限時治療</text>
-          <text x="78" y="92" font-size="22" fill="#294f7c" font-family="sans-serif">家庭會議：目標照護需要共識與紀錄</text></svg>`)
+        src: './assets/illustrations/familyGoals.svg'
       },
       nightShift: {
         caption: '夜間惡化：急性壓力下的公平分配與程序正當性。',
-        src: svgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420">
-          <rect width="800" height="420" fill="#1f2e43"/><rect x="46" y="52" width="708" height="316" rx="18" fill="#2b3f59" stroke="#486482"/>
-          <rect x="90" y="126" width="250" height="164" rx="12" fill="#3f5877"/><circle cx="150" cy="188" r="24" fill="#f5d3bd"/><rect x="184" y="170" width="110" height="56" rx="10" fill="#6e8daf"/>
-          <rect x="390" y="96" width="320" height="214" rx="14" fill="#314a68"/><text x="414" y="142" font-size="30" fill="#ffcf66" font-family="sans-serif">ICU 床位：1</text>
-          <text x="414" y="184" font-size="22" fill="#cfdcf0" font-family="sans-serif">等待名單：2</text><circle cx="658" cy="125" r="20" fill="#ff8f8f"/>
-          <text x="72" y="90" font-size="22" fill="#e5eefb" font-family="sans-serif">夜間惡化：決策必須快且可檢驗</text></svg>`)
+        src: './assets/illustrations/nightShift.svg'
       },
       endingDignity: {
         caption: '結局 A：以病人價值為核心，回到一致的照護安排。',
-        src: svgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420"><rect width="800" height="420" fill="#eef8f2"/><rect x="58" y="62" width="684" height="296" rx="20" fill="#ffffff" stroke="#c4ddcf"/><circle cx="218" cy="188" r="40" fill="#f3d1bc"/><circle cx="330" cy="188" r="34" fill="#f5dbc7"/><circle cx="430" cy="188" r="34" fill="#f4ccb2"/><path d="M196 250h280" stroke="#6ca683" stroke-width="12"/><text x="88" y="108" font-size="24" fill="#2f6f4d" font-family="sans-serif">尊嚴善終：症狀控制與家屬陪伴</text></svg>`)
+        src: './assets/illustrations/endingDignity.svg'
       },
       endingTrial: {
         caption: '結局 B：限時治療，明確時限與退出條件。',
-        src: svgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420"><rect width="800" height="420" fill="#eff6fb"/><rect x="62" y="58" width="676" height="304" rx="20" fill="#ffffff" stroke="#c7d8e8"/><rect x="110" y="116" width="260" height="200" rx="14" fill="#eaf2fb"/><rect x="420" y="116" width="260" height="200" rx="14" fill="#eef5fc"/><circle cx="240" cy="182" r="42" fill="#f3ccb5"/><circle cx="550" cy="182" r="42" fill="#f3ccb5"/><text x="134" y="278" font-size="22" fill="#2c5a86" font-family="sans-serif">24h 再評估</text><text x="88" y="94" font-size="24" fill="#2c5a86" font-family="sans-serif">限時治療：可試、可退、可回頭</text></svg>`)
+        src: './assets/illustrations/endingTrial.svg'
       },
       endingOver: {
         caption: '結局 C：程序偏離導致過度治療與公平爭議。',
-        src: svgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420"><rect width="800" height="420" fill="#f9f1f0"/><rect x="50" y="56" width="700" height="308" rx="18" fill="#ffffff" stroke="#e5c8c5"/><rect x="94" y="114" width="300" height="206" rx="14" fill="#fbe8e6"/><rect x="434" y="114" width="270" height="206" rx="14" fill="#f7dedd"/><path d="M120 154h250" stroke="#9f4343" stroke-width="12"/><path d="M120 194h210" stroke="#9f4343" stroke-width="12"/><text x="456" y="184" font-size="38" fill="#9f4343" font-family="sans-serif">ICU</text><text x="86" y="94" font-size="24" fill="#7f2f2f" font-family="sans-serif">過度治療：短期滿足，長期失衡</text></svg>`)
+        src: './assets/illustrations/endingOver.svg'
       },
       endingDelay: {
         caption: '結局 D：拖延導致急救接管與後續失控。',
-        src: svgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420"><rect width="800" height="420" fill="#f3f2f7"/><rect x="54" y="58" width="692" height="304" rx="18" fill="#ffffff" stroke="#d2d1de"/><rect x="96" y="118" width="608" height="204" rx="14" fill="#ecebf3"/><circle cx="240" cy="206" r="56" fill="#d9d8e7"/><line x1="240" y1="206" x2="240" y2="168" stroke="#66667a" stroke-width="10"/><line x1="240" y1="206" x2="274" y2="206" stroke="#66667a" stroke-width="10"/><text x="354" y="214" font-size="34" fill="#66667a" font-family="sans-serif">延後決策</text><text x="86" y="96" font-size="24" fill="#56566d" font-family="sans-serif">拖延失控：情勢接管病人決策權</text></svg>`)
+        src: './assets/illustrations/endingDelay.svg'
       }
     };
 
@@ -480,6 +494,9 @@
     function renderNode() {
       buildMeters();
       renderSidePanel();
+      stagePanelEl.classList.remove('stage-panel');
+      void stagePanelEl.offsetWidth;
+      stagePanelEl.classList.add('stage-panel');
       const isTransitionPage = state.current === 'transition';
       const node = isTransitionPage ? null : nodes[state.current];
       const artKey = isTransitionPage ? state.transitionArtKey : node.artKey;
@@ -511,6 +528,7 @@
         sceneEl.textContent = node.scene;
         promptEl.textContent = node.prompt;
       }
+      journalEl.open = Boolean(node?.endingTitle);
 
       if (state.quote) {
         quoteEl.hidden = false;
@@ -543,6 +561,8 @@
         btn.className = 'choice';
         btn.textContent = '前往下一頁';
         btn.addEventListener('click', () => {
+          state.quote = '';
+          state.lastFeedback = '';
           state.current = state.pendingNext;
           state.pendingNext = '';
           renderNode();
